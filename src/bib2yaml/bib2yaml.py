@@ -1,12 +1,9 @@
 import argparse
 import bibtexparser
-from pylatexenc.latex2text import LatexNodes2Text
 import yaml
 
 
 def convert_bib(input_file: str, output_file: str, n_max_authors: int):
-    lt = LatexNodes2Text()
-
     months_to_num_dict = {
         "jan": 1,
         "january": 1,
@@ -38,7 +35,10 @@ def convert_bib(input_file: str, output_file: str, n_max_authors: int):
 
     def null_checker(bib_entry, key):
         return (
-            bib_entry.fields_dict[key].value if key in bib_entry.fields_dict and bib_entry.fields_dict[key].value is not None else None
+            bib_entry.fields_dict[key].value
+            if key in bib_entry.fields_dict
+            and bib_entry.fields_dict[key].value is not None
+            else None
         )
 
     library = bibtexparser.parse_file(input_file)
@@ -46,7 +46,9 @@ def convert_bib(input_file: str, output_file: str, n_max_authors: int):
     for entry in library.entries:
         # TODO: Check if the any of the visible name is same as the CV author, if yes then encapsulate in "***"
 
-        authors = [author.strip() for author in entry.fields_dict["author"].value.split("and")]
+        authors = [
+            author.strip() for author in entry.fields_dict["author"].value.split("and")
+        ]
         if len(authors) > n_max_authors:
             authors = [authors[0], "et al."]
 
@@ -59,7 +61,11 @@ def convert_bib(input_file: str, output_file: str, n_max_authors: int):
         }
 
         year = entry.fields_dict.get("year").value
-        month = entry.fields_dict.get("month").value.lower() if "month" in entry.fields_dict else None
+        month = (
+            entry.fields_dict.get("month").value.lower()
+            if "month" in entry.fields_dict
+            else None
+        )
 
         if year:
             full_date = str(year)
