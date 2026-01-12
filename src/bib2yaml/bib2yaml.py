@@ -3,7 +3,9 @@ import bibtexparser
 import yaml
 
 
-def convert_bib(input_file: str, output_file: str, n_max_authors: int):
+def convert_bib(
+    input_file: str, output_file: str, n_max_authors: int, abbreviate_first_names: bool
+):
     months_to_num_dict = {
         "jan": 1,
         "january": 1,
@@ -46,9 +48,16 @@ def convert_bib(input_file: str, output_file: str, n_max_authors: int):
     for entry in library.entries:
         # TODO: Check if the any of the visible name is same as the CV author, if yes then encapsulate in "***"
 
-        authors = [
-            author.strip() for author in entry.fields_dict["author"].value.split("and")
-        ]
+        authors = []
+        for author in entry.fields_dict["author"].value.split("and"):
+            author_names = author.strip().split(",")
+            if abbreviate_first_names:
+                author_names[-1] = author_names[-1].strip()[0] + "."
+            print(author_names)
+
+            authors.append(", ".join(author_names))
+
+        print(authors)
         if len(authors) > n_max_authors:
             authors = [authors[0], "et al."]
 
@@ -107,10 +116,23 @@ def main():
         help="Max number of authors to display, When higher than this treshold, only the first author is shown, the rest is displayed as 'et al'",
         default=7,
     )
+    parser.add_argument(
+        "-a",
+        "--abbreviate-first-names",
+        type=bool,
+        help="If true, only keep the first letter of the authors' first names",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
 
     args = parser.parse_args()
 
-    convert_bib(args.input_file, args.output_file, args.n_max_authors)
+    convert_bib(
+        args.input_file,
+        args.output_file,
+        args.n_max_authors,
+        args.abbreviate_first_names,
+    )
 
 
 if __name__ == "__main__":
