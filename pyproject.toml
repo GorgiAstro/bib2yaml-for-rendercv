@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "bibtexparser>=1.4.3",
+    "bibtexparser>=2.0.0b8",
     "pylatexenc>=2.10",
     "pyyaml>=6.0.3",
 ]
