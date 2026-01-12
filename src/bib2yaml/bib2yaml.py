@@ -38,29 +38,28 @@ def convert_bib(input_file: str, output_file: str, n_max_authors: int):
 
     def null_checker(bib_entry, key):
         return (
-            bib_entry[key] if key in bib_entry and bib_entry[key] is not None else None
+            bib_entry.fields_dict[key].value if key in bib_entry.fields_dict and bib_entry.fields_dict[key].value is not None else None
         )
 
-    with open(input_file) as f:
-        db = bibtexparser.load(f)
+    library = bibtexparser.parse_file(input_file)
 
-    for entry in db.entries:
+    for entry in library.entries:
         # TODO: Check if the any of the visible name is same as the CV author, if yes then encapsulate in "***"
 
-        authors = [author.strip() for author in entry["author"].split("and")]
+        authors = [author.strip() for author in entry.fields_dict["author"].value.split("and")]
         if len(authors) > n_max_authors:
             authors = [authors[0], "et al."]
 
         filtered_entry = {
-            "title": entry["title"],
+            "title": entry.fields_dict["title"].value,
             "authors": authors,
             "journal": null_checker(entry, "journal"),
             "doi": null_checker(entry, "doi"),
             "url": null_checker(entry, "url"),
         }
 
-        year = entry.get("year")
-        month = entry.get("month").lower() if entry.get("month") else None
+        year = entry.fields_dict.get("year").value
+        month = entry.fields_dict.get("month").value.lower() if "month" in entry.fields_dict else None
 
         if year:
             full_date = str(year)
