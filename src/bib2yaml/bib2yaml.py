@@ -71,6 +71,8 @@ def convert_bib(input_file: str, output_file: str, n_max_authors: int):
             full_date = str(year)
             if month:
                 full_date = f"{year}-{months_to_num_dict[month]:02d}"
+            else:
+                filtered_entry["year"] = year
 
         filtered_entry["date"] = full_date
 
